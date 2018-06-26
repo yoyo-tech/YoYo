@@ -1,0 +1,68 @@
+Procedure to build kernel:
+
+Setting up the development environment:
+
+As we need to build the tools we need, that is aarch64 binutils and gcc, we need to install the required build.
+
+Install the following packages:
+
+1.sudo apt-get install build-essential libgmp-dev libmpfr-dev libmpc-dev bc git-core
+
+2.sudo apt-get install gcc-aarch64-linux-gnu
+
+2.sudo apt-get install -y chrpath gawk texinfo libsdl1.2-dev whiptail diffstat cpio libssl-dev
+
+****************************************************************
+2.create one directory like this
+/opt/aarch64  (with sudo permission)
+*****************************************************************
+Go to your home directory
+
+3.Download the latest binutils
+wget https://ftpmirror.gnu.org/binutils/binutils-2.30.tar.gz
+
+Untar using below command
+tar xf binutils-2.29.1.tar.bz2
+
+Configure and install:
+cd binutils-2.29.1
+./configure --prefix=/opt/aarch64 --target=aarch64-linux-gnu --disable-nls
+make -j4
+sudo make install
+**********************************************************************
+Go to your home directory
+
+4.Binutils is now installed, to be able to use it add "/opt/aarch64/bin/" to your path:
+
+export PATH=$PATH:/opt/aarch64/bin/
+
+************************************************************************
+Test that the cross gcc runs ok, run:
+
+aarch64-linux-gnu-gcc -v
+
+****************************************************************************
+To compile the kernel:
+Go to your home directory
+mkdir kernel-out
+cd ..
+git clone https://github.com/yoyo-tech/YoYo.git
+cd YoYo
+cd linux_rpi
+make O=../../../kernel-out/ ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu-  bcmrpi3_defconfig
+
+make -j4 O=../../../kernel-out/ ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu-
+**********************************************************************
+
+After compilation please check the below path to get compiled binaries.
+cd kernel-out
+~/kernel-out$ ls -l arch/arm64/boot/
+total 18208
+   4096 Jun 26 10:37 dts
+ 13490688 Jun 27 01:24 Image
+  5227119 Jun 27 01:24 Image.gz
+/kernel-out$ ls -l arch/arm64/boot/dts/broadcom/*.dtb
+ 17786 Jun 27 00:21 arch/arm64/boot/dts/broadcom/bcm2710-rpi-3-b.dtb
+ 18098 Jun 27 00:21 arch/arm64/boot/dts/broadcom/bcm2710-rpi-3-b-plus.dtb
+ 13265 Jun 27 00:21 arch/arm64/boot/dts/broadcom/bcm2837-rpi-3-b.dtb
+ 13809 Jun 27 00:21 arch/arm64/boot/dts/broadcom/bcm2837-rpi-3-b-plus.dtb
